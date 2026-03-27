@@ -1,7 +1,11 @@
 # VETRAN
-### Trust infrastructure for AI agents.
+**Trust infrastructure for AI agents**
 
 > OAuth was built for humans. Vetran was built for agents.
+
+[![OpenClaw](https://img.shields.io/badge/Built%20with%20OpenClaw-00CC88?logo=github&style=flat)](https://github.com/openclaw/openclaw)
+
+Vetran is an identity and trust registry for autonomous AI agents. It provides JWTs, capability verification, scoped delegation, and instant revocation. Built and deployed using the OpenClaw agent platform.
 
 ---
 
@@ -138,3 +142,11 @@ That's it. Your registry is live at `https://your-app.railway.app`
 ## License
 
 MIT
+
+---
+
+## Acknowledgements
+
+Vetran’s development and deployment were orchestrated using **OpenClaw**, an AI‑assistant platform for building and shipping software.  
+If you’re interested in AI‑first tooling, check out the OpenClaw community:  
+https://github.com/openclaw/openclaw
