@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#081424"/>
+      <stop offset="100%" stop-color="#020304"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00FF7F" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00FF7F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="greenGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg)"/>
+  <rect width="400" height="400" fill="url(#glow)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.06" stroke="#00FF7F" stroke-width="0.5">
+    <line x1="0" y1="50" x2="400" y2="50"/>
+    <line x1="0" y1="100" x2="400" y2="100"/>
+    <line x1="0" y1="150" x2="400" y2="150"/>
+    <line x1="0" y1="200" x2="400" y2="200"/>
+    <line x1="0" y1="250" x2="400" y2="250"/>
+    <line x1="0" y1="300" x2="400" y2="300"/>
+    <line x1="0" y1="350" x2="400" y2="350"/>
+    <line x1="50" y1="0" x2="50" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="400"/>
+    <line x1="150" y1="0" x2="150" y2="400"/>
+    <line x1="200" y1="0" x2="200" y2="400"/>
+    <line x1="250" y1="0" x2="250" y2="400"/>
+    <line x1="300" y1="0" x2="300" y2="400"/>
+    <line x1="350" y1="0" x2="350" y2="400"/>
+  </g>
+
+  <!-- Outer ring -->
+  <circle cx="200" cy="200" r="175" fill="none" stroke="#00FF7F" stroke-width="1" opacity="0.2"/>
+  <circle cx="200" cy="200" r="168" fill="none" stroke="#00FF7F" stroke-width="0.5" opacity="0.1"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#00FF7F" stroke-width="2" fill="none" opacity="0.5">
+    <polyline points="40,70 40,40 70,40"/>
+    <polyline points="330,40 360,40 360,70"/>
+    <polyline points="40,330 40,360 70,360"/>
+    <polyline points="360,330 360,360 330,360"/>
+  </g>
+
+  <!-- Shield shape -->
+  <path d="M200,60 L310,110 L310,210 Q310,290 200,340 Q90,290 90,210 L90,110 Z"
+        fill="#081424" stroke="#00FF7F" stroke-width="2" opacity="0.9"/>
+
+  <!-- Shield inner glow -->
+  <path d="M200,75 L295,118 L295,208 Q295,278 200,322 Q105,278 105,208 L105,118 Z"
+        fill="none" stroke="#00FF7F" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- V mark -->
+  <g filter="url(#softGlow)">
+    <path d="M148,145 L200,255 L252,145"
+          fill="none" stroke="#00FF7F" stroke-width="14"
+          stroke-linecap="square" stroke-linejoin="miter"/>
+  </g>
+  <path d="M148,145 L200,255 L252,145"
+        fill="none" stroke="#00FF7F" stroke-width="10"
+        stroke-linecap="square" stroke-linejoin="miter"/>
+
+  <!-- Horizontal rule under V -->
+  <line x1="148" y1="270" x2="252" y2="270" stroke="#00FF7F" stroke-width="2" opacity="0.6"/>
+
+  <!-- Status dot -->
+  <circle cx="200" cy="285" r="4" fill="#00FF7F" opacity="0.9"/>
+  <circle cx="200" cy="285" r="8" fill="none" stroke="#00FF7F" stroke-width="1" opacity="0.4"/>
+
+  <!-- Scan line animation -->
+  <rect x="90" y="0" width="220" height="3" fill="#00FF7F" opacity="0.06">
+    <animateTransform attributeName="transform" type="translate" from="0,60" to="0,340" dur="3s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Bottom label -->
+  <text x="200" y="378" text-anchor="middle" font-family="monospace" font-size="10"
+        fill="#009944" letter-spacing="6" opacity="0.7">VETRAN</text>
+</svg>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VETRAN // TRUST INFRASTRUCTURE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:    #020304;
+      --deep:     #040810;
+      --surface:  #060D18;
+      --panel:    #081424;
+      --border:   #0F2A1A;
+      --green:    #00FF7F;
+      --green2:   #00CC55;
+      --green3:   #009944;
+      --green-dim:#004422;
+      --green-xs: #001A0D;
+      --amber:    #FFB800;
+      --red:      #FF2233;
+      --cyan:     #00EEFF;
+      --white:    #D0FFE8;
+      --mid:      #4A8A60;
+      --dim:      #1E4A2A;
+      --font-hud: 'Orbitron', sans-serif;
+      --font-mono:'Share Tech Mono', monospace;
+      --font-ui:  'Rajdhani', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--green3); }
+
+    @keyframes flicker { 0%,100%{opacity:1}92%{opacity:1}93%{opacity:.4}94%{opacity:1}96%{opacity:.6}97%{opacity:1} }
+    @keyframes scandown { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulse-border { 0%,100%{border-color:var(--green3);box-shadow:0 0 8px rgba(0,255,127,.1)} 50%{border-color:var(--green);box-shadow:0 0 20px rgba(0,255,127,.3)} }
+    @keyframes radar-sweep { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @keyframes data-stream { 0%{opacity:0;transform:translateY(-10px)} 10%{opacity:1;transform:translateY(0)} 90%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(10px)} }
+    @keyframes glitch {
+      0%{clip-path:inset(40% 0 61% 0);transform:translate(-2px,0)}
+      20%{clip-path:inset(92% 0 1% 0);transform:translate(2px,0)}
+      40%{clip-path:inset(43% 0 1% 0);transform:translate(1px,0)}
+      60%{clip-path:inset(25% 0 58% 0);transform:translate(-1px,0)}
+      80%{clip-path:inset(54% 0 7% 0);transform:translate(2px,0)}
+      100%{clip-path:inset(58% 0 43% 0);transform:translate(-2px,0)}
+    }
+
+    .scan-line {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,127,.4), transparent);
+      animation: scandown 4s linear infinite;
+      pointer-events: none; z-index: 998;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; background: rgba(2,3,4,.9);
+      border-bottom: 1px solid var(--green-dim); backdrop-filter: blur(8px);
+      animation: flicker 8s infinite;
+    }
+    .nav-left { display: flex; align-items: center; gap: 16px; }
+    .nav-logo {
+      font-family: var(--font-hud); font-size: 18px; font-weight: 900;
+      letter-spacing: .3em; color: var(--green); text-decoration: none;
+      text-shadow: 0 0 20px rgba(0,255,127,.5);
+    }
+    .nav-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9px; letter-spacing: .2em; color: var(--green3);
+      border-left: 1px solid var(--dim); padding-left: 16px;
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 6px var(--green);
+      animation: blink 2s infinite; flex-shrink: 0;
+    }
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-link {
+      font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--mid); text-decoration: none; transition: color .2s;
+    }
+    .nav-link:hover { color: var(--green); text-shadow: 0 0 8px var(--green); }
+    .nav-btn {
+      font-family: var(--font-hud); font-size: 9px; font-weight: 700;
+      letter-spacing: .25em; color: var(--black); background: var(--green);
+      padding: 8px 20px; text-decoration: none;
+      clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+      transition: all .2s;
+    }
+    .nav-btn:hover { background: var(--white); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; padding: 80px 32px 60px;
+      display: grid; grid-template-columns: 1fr 440px;
+      gap: 48px; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .tac-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0,255,127,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,127,.03) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
+    }
+    .corner { position: absolute; width: 40px; height: 40px; pointer-events: none; opacity: .5; }
+    .corner.tl { top: 72px; left: 32px; border-top: 2px solid var(--green3); border-left: 2px solid var(--green3); }
+    .corner.tr { top: 72px; right: 32px; border-top: 2px solid var(--green3); border-right: 2px solid var(--green3); }
+    .corner.bl { bottom: 32px; left: 32px; border-bottom: 2px solid var(--green3); border-left: 2px solid var(--green3); }
+    .corner.br { bottom: 32px; right: 32px; border-bottom: 2px solid var(--green3); border-right: 2px solid var(--green3); }
+    .coords {
+      position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; letter-spacing: .2em; color: var(--dim);
+      display: flex; gap: 32px;
+    }
+    .hero-content { position: relative; z-index: 2; animation: fadeIn 1s ease .3s both; }
+    .hero-classification {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--green-xs); border: 1px solid var(--green-dim);
+      padding: 6px 14px; margin-bottom: 32px;
+      font-size: 9px; letter-spacing: .3em; color: var(--green3);
+    }
+    .hero-classification::before { content: '▲'; font-size: 8px; color: var(--amber); }
+    .hero-title {
+      font-family: var(--font-hud); font-size: clamp(56px,8vw,100px);
+      font-weight: 900; line-height: .9; letter-spacing: .05em;
+      color: var(--green); text-shadow: 0 0 40px rgba(0,255,127,.3), 0 0 80px rgba(0,255,127,.1);
+      margin-bottom: 4px; position: relative;
+    }
+    .hero-title::before, .hero-title::after {
+      content: 'VETRAN'; position: absolute; top: 0; left: 0; width: 100%;
+    }
+    .hero-title::before { color: rgba(0,238,255,.3); animation: glitch 4s infinite step-start; animation-delay: 2s; }
+    .hero-title::after  { color: rgba(255,34,51,.2);  animation: glitch 4s infinite step-start; animation-delay: 2.1s; }
+    .hero-subtitle {
+      font-family: var(--font-hud); font-size: clamp(12px,2vw,18px);
+      font-weight: 400; letter-spacing: .4em; color: var(--mid); margin-bottom: 40px;
+    }
+    .hero-desc {
+      font-family: var(--font-ui); font-size: 17px; font-weight: 300;
+      color: var(--mid); max-width: 520px; line-height: 1.7; margin-bottom: 48px;
+      border-left: 2px solid var(--green-dim); padding-left: 20px;
+    }
+    .hero-desc strong { color: var(--green); font-weight: 600; }
+    .hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .btn-ops {
+      font-family: var(--font-hud); font-size: 10px; font-weight: 700;
+      letter-spacing: .3em; color: var(--black); background: var(--green);
+      padding: 14px 36px; text-decoration: none;
+      clip-path: polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
+      transition: all .2s; display: inline-flex; align-items: center; gap: 10px;
+      box-shadow: 0 0 24px rgba(0,255,127,.2);
+    }
+    .btn-ops:hover { background: var(--white); box-shadow: 0 0 40px rgba(0,255,127,.4); }
+    .btn-ghost {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em;
+      color: var(--mid); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--dim); padding: 13px 24px; transition: all .2s;
+    }
+    .btn-ghost:hover { border-color: var(--green3); color: var(--green); }
+
+    /* HUD PANEL */
+    .hud-panel { position: relative; z-index: 2; animation: fadeIn 1s ease .7s both; }
+    .hud-frame {
+      border: 1px solid var(--green-dim); background: var(--deep);
+      position: relative; animation: pulse-border 3s infinite;
+    }
+    .hud-frame::before {
+      content: 'AGENT VERIFICATION SYSTEM'; position: absolute;
+      top: -10px; left: 16px; background: var(--deep); padding: 0 8px;
+      font-size: 8px; letter-spacing: .25em; color: var(--green3);
+    }
+    .hud-frame::after {
+      content: 'v1.0.0'; position: absolute; top: -10px; right: 16px;
+      background: var(--deep); padding: 0 8px; font-size: 8px; letter-spacing: .15em; color: var(--dim);
+    }
+    .hud-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--green-dim); background: var(--surface);
+    }
+    .hud-title { font-size: 9px; letter-spacing: .25em; color: var(--mid); }
+    .hud-live { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: .2em; color: var(--green); }
+
+    /* Radar */
+    .radar-container { display: flex; justify-content: center; align-items: center; padding: 28px; }
+    .radar { width: 160px; height: 160px; position: relative; }
+    .radar-ring { position: absolute; border-radius: 50%; border: 1px solid var(--green-dim); }
+    .radar-ring:nth-child(1){inset:0} .radar-ring:nth-child(2){inset:20px;opacity:.7}
+    .radar-ring:nth-child(3){inset:40px;opacity:.5} .radar-ring:nth-child(4){inset:60px;opacity:.3}
+    .radar-cross { position: absolute; inset: 0; }
+    .radar-cross::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:var(--green-dim); transform:translateY(-50%); }
+    .radar-cross::after  { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background:var(--green-dim); transform:translateX(-50%); }
+    .radar-sweep {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(0,255,127,.08) 330deg, rgba(0,255,127,.25) 360deg);
+      animation: radar-sweep 3s linear infinite;
+    }
+    .radar-sweep::after {
+      content:''; position:absolute; top:50%; left:50%; width:50%; height:2px;
+      background:linear-gradient(90deg,transparent,var(--green));
+      transform-origin:left center; transform:translateY(-50%);
+    }
+    .blip { position:absolute; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
+    .blip::after { content:''; position:absolute; inset:-4px; border-radius:50%; border:1px solid var(--green3); animation:blink 1.5s infinite; }
+    .blip-1{top:30px;left:45px} .blip-2{top:70px;right:28px} .blip-3{bottom:40px;left:55px}
+    .blip-warn { background:var(--amber); box-shadow:0 0 8px var(--amber); }
+    .blip-warn::after { border-color:var(--amber); }
+    .center-dot { position:absolute; width:8px; height:8px; border-radius:50%; background:var(--green); top:50%; left:50%; transform:translate(-50%,-50%); box-shadow:0 0 16px var(--green); }
+
+    /* Readouts */
+    .readouts { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .readout {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: var(--surface); border: 1px solid var(--border);
+      border-left: 2px solid var(--green3); font-size: 10px; letter-spacing: .1em;
+    }
+    .readout.cleared{border-left-color:var(--green)} .readout.denied{border-left-color:var(--red)} .readout.pending{border-left-color:var(--amber)}
+    .readout-label{color:var(--dim);font-size:9px;letter-spacing:.15em}
+    .readout-value{display:flex;align-items:center;gap:8px}
+    .readout-id{color:var(--mid)}
+    .tag{font-size:8px;letter-spacing:.2em;padding:2px 8px;font-weight:600}
+    .tag.cleared{background:rgba(0,255,127,.1);color:var(--green);border:1px solid var(--green3)}
+    .tag.denied {background:rgba(255,34,51,.1); color:var(--red);  border:1px solid rgba(255,34,51,.4)}
+    .tag.pending{background:rgba(255,184,0,.1); color:var(--amber);border:1px solid rgba(255,184,0,.4)}
+
+    /* Terminal */
+    .hud-terminal {
+      border-top: 1px solid var(--green-dim); padding: 12px 16px;
+      font-size: 10px; letter-spacing: .05em; color: var(--green3);
+      background: var(--black); min-height: 80px;
+    }
+    .terminal-line { display:flex; gap:8px; margin-bottom:4px; }
+    .t-prompt{color:var(--green)} .t-cmd{color:var(--mid)} .t-out{color:var(--green3)}
+    .cursor-blink { display:inline-block; width:7px; height:12px; background:var(--green); animation:blink 1s infinite; vertical-align:middle; }
+
+    /* STATS BAR */
+    .stats-bar {
+      background: var(--surface); border-top: 1px solid var(--green-dim); border-bottom: 1px solid var(--green-dim);
+      padding: 0 32px; display: grid; grid-template-columns: repeat(4,1fr);
+    }
+    .stat-item { padding:24px 16px; border-right:1px solid var(--green-dim); animation:fadeIn .8s ease both; }
+    .stat-item:last-child{border-right:none}
+    .stat-item:nth-child(1){animation-delay:.1s} .stat-item:nth-child(2){animation-delay:.2s}
+    .stat-item:nth-child(3){animation-delay:.3s} .stat-item:nth-child(4){animation-delay:.4s}
+    .stat-num { font-family:var(--font-hud); font-size:28px; font-weight:700; color:var(--green); text-shadow:0 0 20px rgba(0,255,127,.3); letter-spacing:.05em; }
+    .stat-label { font-size:9px; letter-spacing:.25em; text-transform:uppercase; color:var(--dim); margin-top:4px; }
+
+    /* SECTION */
+    .section { padding:80px 32px; position:relative; }
+    .section-header { display:flex; align-items:center; gap:16px; margin-bottom:48px; }
+    .section-tag { font-size:9px; letter-spacing:.3em; color:var(--green3); border:1px solid var(--green-dim); padding:4px 12px; background:var(--green-xs); }
+    .section-title { font-family:var(--font-hud); font-size:28px; font-weight:700; letter-spacing:.15em; color:var(--green); }
+    .section-line { flex:1; height:1px; background:linear-gradient(90deg,var(--green-dim),transparent); }
+
+    /* ENDPOINTS */
+    .endpoints-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:2px; }
+    .endpoint-card { background:var(--deep); border:1px solid var(--border); transition:all .2s; position:relative; overflow:hidden; }
+    .endpoint-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--green-dim); transition:background .2s; }
+    .endpoint-card:hover{border-color:var(--green3)} .endpoint-card:hover::before{background:var(--green)}
+    .endpoint-header { display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface); }
+    .method { font-family:var(--font-hud); font-size:9px; font-weight:700; letter-spacing:.15em; padding:3px 10px; }
+    .method.post{background:rgba(0,255,127,.1);color:var(--green);border:1px solid var(--green-dim)}
+    .method.get {background:rgba(0,238,255,.1);color:var(--cyan); border:1px solid rgba(0,238,255,.2)}
+    .endpoint-path { font-family:var(--font-mono); font-size:13px; color:var(--white); letter-spacing:.05em; }
+    .endpoint-body { padding:16px 20px; }
+    .endpoint-desc { font-family:var(--font-ui); font-size:14px; font-weight:300; color:var(--mid); margin-bottom:12px; line-height:1.6; }
+    .endpoint-tags { display:flex; flex-wrap:wrap; gap:6px; }
+    .etag { font-size:9px; letter-spacing:.15em; padding:3px 10px; background:var(--green-xs); color:var(--green3); border:1px solid var(--green-dim); }
+
+    /* HOW IT WORKS */
+    .how-section { padding:80px 32px; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .flow-steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0; margin-top:48px; }
+    .flow-step { padding:32px 24px; border-right:1px solid var(--border); position:relative; }
+    .flow-step:last-child{border-right:none}
+    .step-num { font-family:var(--font-hud); font-size:48px; font-weight:900; color:var(--green-dim); line-height:1; margin-bottom:16px; }
+    .step-title { font-family:var(--font-hud); font-size:14px; font-weight:700; letter-spacing:.2em; color:var(--green); margin-bottom:10px; }
+    .step-desc { font-family:var(--font-ui); font-size:14px; font-weight:300; color:var(--mid); line-height:1.6; }
+    .step-arrow { position:absolute; right:-12px; top:50%; transform:translateY(-50%); color:var(--green-dim); font-size:18px; z-index:2; }
+
+    /* CODE */
+    .code-section { padding:80px 32px; }
+    .code-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-top:48px; }
+    .code-block { background:var(--black); border:1px solid var(--border); }
+    .code-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:var(--surface); border-bottom:1px solid var(--border); }
+    .code-bar-title { font-size:9px; letter-spacing:.2em; color:var(--dim); }
+    .code-lang { font-size:9px; letter-spacing:.15em; color:var(--green3); background:var(--green-xs); padding:2px 8px; border:1px solid var(--green-dim); }
+    pre { padding:20px; font-family:var(--font-mono); font-size:11.5px; line-height:1.7; color:var(--mid); overflow-x:auto; }
+    .c-kw{color:var(--cyan)} .c-fn{color:var(--green)} .c-str{color:var(--amber)}
+    .c-cmt{color:var(--dim);font-style:italic} .c-key{color:#B8D4FF} .c-tag{color:var(--green3)}
+
+    /* PRICING */
+    .pricing-section { padding:80px 32px; background:var(--surface); border-top:1px solid var(--border); }
+    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:2px; margin-top:48px; }
+    .price-card { background:var(--deep); border:1px solid var(--border); padding:32px; position:relative; transition:all .2s; }
+    .price-card.featured { border-color:var(--green3); background:var(--panel); }
+    .price-card.featured::before {
+      content:'RECOMMENDED'; position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+      background:var(--green); color:var(--black); font-family:var(--font-hud);
+      font-size:8px; font-weight:700; letter-spacing:.2em; padding:2px 12px;
+    }
+    .price-tier { font-size:9px; letter-spacing:.3em; color:var(--dim); margin-bottom:12px; }
+    .price-amount { font-family:var(--font-hud); font-size:40px; font-weight:900; color:var(--green); letter-spacing:.05em; line-height:1; margin-bottom:4px; }
+    .price-per { font-size:10px; color:var(--dim); letter-spacing:.15em; margin-bottom:24px; }
+    .price-features { list-style:none; margin-bottom:28px; }
+    .price-features li { display:flex; align-items:flex-start; gap:10px; font-family:var(--font-ui); font-size:13px; font-weight:300; color:var(--mid); padding:6px 0; border-bottom:1px solid var(--border); }
+    .price-features li::before { content:'//'; color:var(--green3); font-size:10px; flex-shrink:0; margin-top:2px; }
+    .price-btn { display:block; text-align:center; font-family:var(--font-hud); font-size:10px; font-weight:700; letter-spacing:.25em; text-decoration:none; padding:12px; transition:all .2s; }
+    .price-btn.outline { border:1px solid var(--green3); color:var(--green); }
+    .price-btn.outline:hover { background:var(--green-xs); }
+    .price-btn.solid { background:var(--green); color:var(--black); clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+    .price-btn.solid:hover { background:var(--white); }
+
+    /* CTA */
+    .cta-section { padding:80px 32px; text-align:center; position:relative; overflow:hidden; }
+    .cta-bg { position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(0,255,127,.04) 0%,transparent 70%); pointer-events:none; }
+    .cta-title { font-family:var(--font-hud); font-size:clamp(32px,5vw,60px); font-weight:900; letter-spacing:.1em; color:var(--green); text-shadow:0 0 40px rgba(0,255,127,.2); margin-bottom:16px; position:relative; z-index:1; }
+    .cta-sub { font-family:var(--font-ui); font-size:18px; font-weight:300; color:var(--mid); max-width:480px; margin:0 auto 40px; position:relative; z-index:1; }
+    .cta-actions { display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap; position:relative; z-index:1; }
+
+    /* FOOTER */
+    footer { background:var(--surface); border-top:1px solid var(--green-dim); padding:24px 32px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+    .footer-logo { font-family:var(--font-hud); font-size:14px; font-weight:900; letter-spacing:.3em; color:var(--green3); }
+    .footer-copy { font-size:9px; letter-spacing:.2em; color:var(--dim); }
+    .footer-links { display:flex; gap:24px; }
+    .footer-links a { font-size:9px; letter-spacing:.2em; color:var(--dim); text-decoration:none; transition:color .2s; }
+    .footer-links a:hover { color:var(--green); }
+
+    @media (max-width:1100px) { .hero{grid-template-columns:1fr} .hud-panel{display:none} }
+    @media (max-width:900px) { .code-grid{grid-template-columns:1fr} .stats-bar{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:600px) { nav .nav-right .nav-link{display:none} .stats-bar{grid-template-columns:1fr 1fr} }
+  </style>
+</head>
+<body>
+
+<div class="scan-line"></div>
+
+<nav>
+  <div class="nav-left">
+    <a href="#" class="nav-logo">VETRAN</a>
+    <div class="nav-status"><div class="status-dot"></div>ALL SYSTEMS OPERATIONAL</div>
+  </div>
+  <div class="nav-right">
+    <a href="#endpoints" class="nav-link">Endpoints</a>
+    <a href="#how" class="nav-link">How It Works</a>
+    <a href="#pricing" class="nav-link">Pricing</a>
+    <a href="#docs" class="nav-link">Docs</a>
+    <a href="#" class="nav-btn">REQUEST ACCESS</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="tac-grid"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+
+  <div class="hero-content">
+    <div class="hero-classification">CLASSIFICATION: OPEN // PROTOCOL v1.0 // CLEARANCE REQUIRED</div>
+    <h1 class="hero-title">VETRAN</h1>
+    <div class="hero-subtitle">// TRUST INFRASTRUCTURE FOR AI AGENTS</div>
+    <p class="hero-desc">
+      When AI agents operate autonomously, <strong>you need to know who's cleared.</strong>
+      Vetran is the identity and trust layer that verifies every agent,
+      traces every delegation chain, and kills access the moment trust is revoked.
+      <br><br>
+      <strong>OAuth was built for humans. Vetran was built for agents.</strong>
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-ops"><span>▶</span><span>DEPLOY VETRAN</span></a>
+      <a href="#endpoints" class="btn-ghost">VIEW ENDPOINTS →</a>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud-panel">
+    <div class="hud-frame">
+      <div class="hud-header">
+        <span class="hud-title">LIVE VERIFICATION FEED</span>
+        <span class="hud-live"><div class="status-dot"></div>ACTIVE</span>
+      </div>
+      <div class="radar-container">
+        <div class="radar">
+          <div class="radar-ring"></div><div class="radar-ring"></div>
+          <div class="radar-ring"></div><div class="radar-ring"></div>
+          <div class="radar-cross"></div>
+          <div class="radar-sweep"></div>
+          <div class="center-dot"></div>
+          <div class="blip blip-1"></div>
+          <div class="blip blip-2"></div>
+          <div class="blip blip-3 blip-warn"></div>
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="readout cleared">
+          <div><div class="readout-label">AGENT ID</div><div class="readout-id">agt_7e2998e8e116</div></div>
+          <div class="readout-value"><span class="tag cleared">CLEARED</span></div>
+        </div>
+        <div class="readout denied">
+          <div><div class="readout-label">AGENT ID</div><div class="readout-id">agt_22f1da6eb678</div></div>
+          <div class="readout-value"><span class="tag denied">REVOKED</span></div>
+        </div>
+        <div class="readout pending">
+          <div><div class="readout-label">AGENT ID</div><div class="readout-id">agt_9c4f3b1a2d55</div></div>
+          <div class="readout-value"><span class="tag pending">PENDING</span></div>
+        </div>
+      </div>
+      <div class="hud-terminal">
+        <div class="terminal-line"><span class="t-prompt">$</span><span class="t-cmd" id="t-cmd">vran verify agt_7e2998e8e116</span></div>
+        <div class="terminal-line"><span class="t-out" id="t-out">✓ CLEARED TO EXECUTE — BADGE: ELITE</span></div>
+        <div class="terminal-line"><span class="t-prompt">$</span><span class="t-cmd"><span class="cursor-blink"></span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="coords">
+    <span>LAT 37.7749° N</span><span>LON 122.4194° W</span>
+    <span>ALT 0052M</span><span id="utc-time">UTC 2026-03-25T03:12:13Z</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">&lt;100ms</div><div class="stat-label">// Avg verify latency</div></div>
+  <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">// Core API endpoints</div></div>
+  <div class="stat-item"><div class="stat-num">JWT</div><div class="stat-label">// Signed identity tokens</div></div>
+  <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">// Delegation chain depth</div></div>
+</div>
+
+<!-- ENDPOINTS -->
+<section class="section" id="endpoints">
+  <div class="section-header">
+    <div class="section-tag">PROTOCOL</div>
+    <h2 class="section-title">API ENDPOINTS</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="endpoints-grid">
+    <div class="endpoint-card">
+      <div class="endpoint-header"><span class="method post">POST</span><span class="endpoint-path">/register</span></div>
+      <div class="endpoint-body"><p class="endpoint-desc">Register a new agent in the Vetran registry. Returns a signed JWT identity token and unique agent ID.</p><div class="endpoint-tags"><span class="etag">IDENTITY</span><span class="etag">JWT</span><span class="etag">CAPABILITIES</span></div></div>
+    </div>
+    <div class="endpoint-card">
+      <div class="endpoint-header"><span class="method post">POST</span><span class="endpoint-path">/verify</span></div>
+      <div class="endpoint-body"><p class="endpoint-desc">Verify an agent's identity token and check if it holds the requested capabilities. Returns clearance status instantly.</p><div class="endpoint-tags"><span class="etag">TRUST</span><span class="etag">CAPABILITY CHECK</span><span class="etag">CLEARANCE</span></div></div>
+    </div>
+    <div class="endpoint-card">
+      <div class="endpoint-header"><span class="method post">POST</span><span class="endpoint-path">/delegate</span></div>
+      <div class="endpoint-body"><p class="endpoint-desc">Issue a scoped delegation token from a parent agent to a child. Builds an auditable trust chain with expiry control.</p><div class="endpoint-tags"><span class="etag">DELEGATION</span><span class="etag">CHAIN</span><span class="etag">SCOPED</span></div></div>
+    </div>
+    <div class="endpoint-card">
+      <div class="endpoint-header"><span class="method get">GET</span><span class="endpoint-path">/status/:agentId</span></div>
+      <div class="endpoint-body"><p class="endpoint-desc">Get live standing of any registered agent — badge level, Vetran score, verification count, delegation history.</p><div class="endpoint-tags"><span class="etag">STATUS</span><span class="etag">BADGE</span><span class="etag">SCORE</span></div></div>
+    </div>
+    <div class="endpoint-card">
+      <div class="endpoint-header"><span class="method post">POST</span><span class="endpoint-path">/revoke/:agentId</span></div>
+      <div class="endpoint-body"><p class="endpoint-desc">Instantly revoke an agent. All future verification calls return DENIED. Logs reason and timestamp permanently.</p><div class="endpoint-tags"><span class="etag">REVOCATION</span><span class="etag">INSTANT</span><span class="etag">AUDIT LOG</span></div></div>
+    </div>
+    <div class="endpoint-card">
+      <div class="endpoint-header"><span class="method get">GET</span><span class="endpoint-path">/</span></div>
+      <div class="endpoint-body"><p class="endpoint-desc">Service health check and version info. Confirms the Vetran registry is operational before any agent workflow begins.</p><div class="endpoint-tags"><span class="etag">HEALTH</span><span class="etag">VERSION</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-header">
+    <div class="section-tag">SEQUENCE</div>
+    <h2 class="section-title">HOW IT WORKS</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="step-num">01</div>
+      <div class="step-title">REGISTER</div>
+      <p class="step-desc">Your agent registers with Vetran. Receives a signed JWT identity token and unique agent ID. Declares its capabilities and owner org.</p>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">02</div>
+      <div class="step-title">VERIFY</div>
+      <p class="step-desc">Before any agent executes, call /verify. Vetran checks identity, validates the token, confirms capabilities, and returns clearance in under 100ms.</p>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">03</div>
+      <div class="step-title">DELEGATE</div>
+      <p class="step-desc">When Agent A spawns Agent B, it issues a scoped delegation token. The trust chain is cryptographically linked and fully auditable end-to-end.</p>
+      <span class="step-arrow">▶</span>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">04</div>
+      <div class="step-title">REVOKE</div>
+      <p class="step-desc">When something goes wrong, one call to /revoke shuts it down instantly. The agent is blacklisted across the entire chain. Immediate. Irrevocable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CODE -->
+<section class="code-section" id="docs">
+  <div class="section-header">
+    <div class="section-tag">INTEGRATION</div>
+    <h2 class="section-title">SHIP IN MINUTES</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="code-grid">
+    <div class="code-block">
+      <div class="code-bar"><span class="code-bar-title">REGISTER AN AGENT</span><span class="code-lang">PYTHON</span></div>
+      <pre><span class="c-kw">import</span> vetran
+
+<span class="c-cmt"># Register your agent</span>
+agent = vetran.<span class="c-fn">register</span>(
+  <span class="c-key">name</span>=<span class="c-str">"SchedulerAgent"</span>,
+  <span class="c-key">owner</span>=<span class="c-str">"acme-corp"</span>,
+  <span class="c-key">capabilities</span>=[
+    <span class="c-str">"read:calendar"</span>,
+    <span class="c-str">"write:calendar"</span>,
+  ]
+)
+
+<span class="c-fn">print</span>(agent.<span class="c-key">agent_id</span>)  <span class="c-cmt"># agt_7e2998e8e116</span>
+<span class="c-fn">print</span>(agent.<span class="c-key">badge</span>)     <span class="c-cmt"># ROOKIE → ELITE</span></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="code-bar-title">VERIFY BEFORE EXECUTION</span><span class="code-lang">JAVASCRIPT</span></div>
+      <pre><span class="c-kw">import</span> { verify } <span class="c-kw">from</span> <span class="c-str">'@vetran/sdk'</span>
+
+<span class="c-kw">const</span> result = <span class="c-kw">await</span> <span class="c-fn">verify</span>({
+  <span class="c-key">token</span>: agent.token,
+  <span class="c-key">requestedCapabilities</span>: [
+    <span class="c-str">'read:calendar'</span>
+  ]
+})
+
+<span class="c-kw">if</span> (result.<span class="c-key">clearedToExecute</span>) {
+  <span class="c-fn">runAgent</span>() <span class="c-cmt">// ✓ Vetran-verified</span>
+} <span class="c-kw">else</span> {
+  <span class="c-fn">console</span>.<span class="c-fn">error</span>(<span class="c-str">'NOT CLEARED'</span>)
+}</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="code-bar-title">DELEGATE TRUST</span><span class="code-lang">JAVASCRIPT</span></div>
+      <pre><span class="c-kw">import</span> { delegate } <span class="c-kw">from</span> <span class="c-str">'@vetran/sdk'</span>
+
+<span class="c-kw">const</span> chain = <span class="c-kw">await</span> <span class="c-fn">delegate</span>({
+  <span class="c-key">parentToken</span>: agentA.token,
+  <span class="c-key">childAgentId</span>: agentB.agentId,
+  <span class="c-key">scopedCapabilities</span>: [
+    <span class="c-str">'read:calendar'</span>
+  ],
+  <span class="c-key">expiresIn</span>: <span class="c-str">'1h'</span>
+})
+
+<span class="c-cmt">// [agt_7e29 → agt_22f1]</span>
+<span class="c-fn">console</span>.<span class="c-fn">log</span>(chain.<span class="c-key">chain</span>)</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="code-bar-title">CLI — INSTANT VERIFICATION</span><span class="code-lang">TERMINAL</span></div>
+      <pre><span class="c-cmt"># Install the CLI</span>
+<span class="c-fn">npm</span> install -g @vetran/cli
+
+<span class="c-cmt"># Verify any agent</span>
+<span class="c-tag">$</span> vran verify agt_7e2998e8e116
+<span class="c-fn">✓ CLEARED</span> — BADGE: ELITE | SCORE: 100
+
+<span class="c-cmt"># Instant revocation</span>
+<span class="c-tag">$</span> vran revoke agt_22f1da6eb678
+<span class="c-str">✗ REVOKED</span> — blacklisted across all chains</pre>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-header">
+    <div class="section-tag">ACCESS TIERS</div>
+    <h2 class="section-title">CLEARANCE LEVELS</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">// LEVEL 1 — RECRUIT</div>
+      <div class="price-amount">$0</div>
+      <div class="price-per">forever free</div>
+      <ul class="price-features">
+        <li>10,000 verifications / month</li>
+        <li>25 registered agents</li>
+        <li>Public registry</li>
+        <li>7-day audit log</li>
+        <li>Community support</li>
+      </ul>
+      <a href="#" class="price-btn outline">REQUEST ACCESS</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-tier">// LEVEL 2 — OPERATIVE</div>
+      <div class="price-amount">$49</div>
+      <div class="price-per">per month</div>
+      <ul class="price-features">
+        <li>500,000 verifications / month</li>
+        <li>Unlimited agents</li>
+        <li>Private registry</li>
+        <li>90-day audit log</li>
+        <li>Webhook revocation events</li>
+        <li>Email support + SLA</li>
+      </ul>
+      <a href="#" class="price-btn solid">DEPLOY NOW</a>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">// LEVEL 3 — COMMAND</div>
+      <div class="price-amount">$299</div>
+      <div class="price-per">per month</div>
+      <ul class="price-features">
+        <li>Unlimited verifications</li>
+        <li>Multi-org registries</li>
+        <li>Immutable audit log</li>
+        <li>SSO + SCIM provisioning</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="#" class="price-btn outline">CONTACT US</a>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">// LEVEL 4 — CLASSIFIED</div>
+      <div class="price-amount">—</div>
+      <div class="price-per">custom pricing</div>
+      <ul class="price-features">
+        <li>On-premise deployment</li>
+        <li>Air-gapped registry</li>
+        <li>SOC2 / FedRAMP exports</li>
+        <li>Dedicated infrastructure</li>
+        <li>Enterprise SLA</li>
+      </ul>
+      <a href="#" class="price-btn outline">REQUEST BRIEFING</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="cta-title">VET YOUR AGENTS.</div>
+  <p class="cta-sub">The AI agent ecosystem is expanding fast. Don't let unknown agents execute with unchecked trust.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-ops"><span>▶</span><span>START FREE</span></a>
+    <a href="#docs" class="btn-ghost">READ THE DOCS →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">VETRAN</div>
+  <div class="footer-copy">// TRUST INFRASTRUCTURE FOR AI AGENTS // © 2026</div>
+  <div class="footer-links">
+    <a href="#">Docs</a><a href="#">GitHub</a><a href="#">Status</a><a href="#">Privacy</a>
+  </div>
+</footer>
+
+<script>
+  // Live UTC clock
+  setInterval(() => {
+    const el = document.getElementById('utc-time');
+    if (el) el.textContent = 'UTC ' + new Date().toISOString().slice(0,19) + 'Z';
+  }, 1000);
+
+  // Cycle terminal commands
+  const cmds = ['vran verify agt_7e2998e8e116','vran verify agt_22f1da6eb678','vran verify agt_9c4f3b1a2d55','vran verify agt_4a8f9b2c3d11','vran revoke agt_badactor0000'];
+  const outs = ['✓ CLEARED TO EXECUTE — BADGE: ELITE','✗ AGENT REVOKED — NOT CLEARED','⚠ CAPABILITY MISMATCH — DENIED','✓ CLEARED TO EXECUTE — BADGE: ACTIVE','✗ REVOKED — BLACKLISTED ACROSS ALL CHAINS'];
+  let ti = 0;
+  setInterval(() => {
+    ti = (ti + 1) % cmds.length;
+    const c = document.getElementById('t-cmd');
+    const o = document.getElementById('t-out');
+    if (c) c.textContent = cmds[ti];
+    if (o) { o.textContent = outs[ti]; o.style.color = outs[ti].startsWith('✓') ? 'var(--green)' : outs[ti].startsWith('✗') ? 'var(--red)' : 'var(--amber)'; }
+  }, 3000);
+
+  // Cycle readout statuses
+  const statuses = ['CLEARED','REVOKED','PENDING'];
+  const sClass   = ['cleared','denied','pending'];
+  setInterval(() => {
+    const readouts = document.querySelectorAll('.readout');
+    const idx = Math.floor(Math.random() * readouts.length);
+    const r = readouts[idx];
+    const tag = r.querySelector('.tag');
+    if (!tag) return;
+    const p = Math.floor(Math.random() * statuses.length);
+    r.className = 'readout ' + sClass[p];
+    tag.className = 'tag ' + sClass[p];
+    tag.textContent = statuses[p];
+  }, 2500);
+</script>
+</body>
+</html>

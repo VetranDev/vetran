@@ -1,0 +1,32 @@
+{
+  "name": "vetran",
+  "version": "1.0.0",
+  "description": "Trust infrastructure for AI agents",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "trust",
+    "jwt",
+    "verification"
+  ],
+  "author": "vetrandev",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0",
+    "uuid": "^10.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

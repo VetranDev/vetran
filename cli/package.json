@@ -1,0 +1,19 @@
+{
+  "name": "@vetran/cli",
+  "version": "1.0.0",
+  "description": "Vetran CLI — Trust infrastructure for AI agents",
+  "main": "src/vran.js",
+  "bin": {
+    "vran": "./src/vran.js"
+  },
+  "scripts": {
+    "start": "node src/vran.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0",
+    "express": "^5.2.1",
+    "ora": "^5.4.1"
+  }
+}
